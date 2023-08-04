@@ -4,13 +4,21 @@ const app = express();
 app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded( {extended : false } ));
-const mysql = require('mysql');
-const connection = mysql.createConnection({
-  host     : 'localhost',
+const maria = require('mysql'); // 호환됌!!!
+const connection = maria.createConnection({
+  host     : 'svc.sel4.cloudtype.app',
+  port     : 30001,
   user     : 'root',
   password : '12345678',
-  database : 'opentutorials'
+  database : 'tutorial'
 })
+// const connection = maria.createConnection({
+//     host     : 'localhost',
+//     port     :  3307,
+//     user     : 'root',
+//     password : '12345678',
+//     database : 'opentutorials'
+//   })
 connection.connect();
 
 app.get('/', (req, res) => {
@@ -125,10 +133,9 @@ app.get('/', (req, res) => {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({title:document.getElementById("newTitle").value,
-                         description:document.getElementById("newauthor").value,
-                         author:document.getElementById("newdescription").value})
+                         description:document.getElementById("newdescription").value,
+                         author:document.getElementById("newauthor").value})
                     })
-                    .then(location.reload(true))
                     .then(location.reload(true));
                 })
             document.getElementById("modifybutton").addEventListener('click', () => {
@@ -148,13 +155,14 @@ app.get('/', (req, res) => {
                         },
                         body: JSON.stringify({id:document.getElementById("id").innerHTML,
                         title:document.getElementById("changetitle").value,
-                        description:document.getElementById("changeauthor").value,
-                        author:document.getElementById("changedescription").value})
+                        description:document.getElementById("changedescription").value,
+                        author:document.getElementById("changeauthor").value})
                     })
                     .then(location.reload(true))
             })
         </script>
-        </body>            `;
+        </body>
+        `;
     res.send(html);
     })
 });
