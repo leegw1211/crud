@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <style>
+        #maindiv {
+            display: flex;
+        }
+        #post {
+            margin-left:50px;
+        }
+        #create, #modify {
+            margin-left:50px;
+            margin-top:30px;
+        }
+        #buttons, #create, #modify, #id {
+            display: none;
+        }
+        #createbutton {
+            margin-left:65px;
+        }
+        #create input, #modify input {
+            display: block;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div id="maindiv">
+    <div>
+        <ol id="list">
+        </ol>
+    </div>
+    <div id="post">
+        <h1 id="title"></h1>
+        <p id="author"></p>
+        <p id="content"></p>
+        <div id="buttons">
+            <button id="modifybutton">수정</button>
+            <button id="delbutton">삭제</button>
+        </div>
+        <p id="id"></p>
+    </div>
+    <div id="create">
+        <input id="newTitle" placeholder="title">
+        <input id="newauthor" placeholder="author">
+        <input id="newdescription" placeholder="description">
+        <button id="upload">ok</button>
+    </div>
+    <div id="modify">
+        <input id="changetitle">
+        <input id="changeauthor">
+        <input id="changedescription">
+        <button id="change">ok</button>
+    </div>
+</div>
+<div>
+    <button id="createbutton">+</button>
+</div>
+
+<script>
+    const root = "https://port-0-crud-3prof2llkwd4om9.sel4.cloudtype.app/"
+    fetch(`${root}load`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        var i = 0;
+        while(i < data.length){
+            var new_post = document.createElement('li');
+            new_post.setAttribute('id', data[i].id);
+            new_post.innerHTML = data[i].title;
+            document.getElementById("list").appendChild(new_post);
+            i = i + 1;
+        }
+        const liElements = document.querySelectorAll('#list li');
+        liElements.forEach((li) => {
+            li.addEventListener('click', () => {
+                fetch(`${root}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({id:li.id})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("title").innerHTML = data[0].title;
+                    document.getElementById("author").innerHTML = data[0].name;
+                    document.getElementById("content").innerHTML = data[0].description;
+                    document.getElementById("buttons").style.display = "block";
+                    document.getElementById("id").innerHTML = data[0].id;
+                
+                    document.getElementById("create").style.display = "none";
+                    document.getElementById("modify").style.display = "none";
+                    document.getElementById("post").style.display = "block";});
+                })
+        });
+    })
+    document.getElementById("delbutton").addEventListener('click', () => {
+        fetch(`${root}delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({id:document.getElementById("id").innerHTML})
+            })
+            .then(location.reload(true));
+    })
+    document.getElementById("createbutton").addEventListener('click', () => {
+        document.getElementById("post").style.display = "none";
+        document.getElementById("modify").style.display = "none";
+        document.getElementById("create").style.display = "block";
+    })
+    document.getElementById("upload").addEventListener('click', () => {
+        fetch(`${root}create`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({title:document.getElementById("newTitle").value,
+                 description:document.getElementById("newdescription").value,
+                 author:document.getElementById("newauthor").value})
+            })
+            .then(location.reload(true));
+        })
+    document.getElementById("modifybutton").addEventListener('click', () => {
+        document.getElementById("changetitle").value = document.getElementById("title").innerHTML;
+        document.getElementById("changeauthor").value = document.getElementById("author").innerHTML;
+        document.getElementById("changedescription").value = document.getElementById("content").innerHTML;
+
+        document.getElementById("post").style.display = "none";
+        document.getElementById("create").style.display = "none";
+        document.getElementById("modify").style.display = "block";
+    })
+    document.getElementById("change").addEventListener('click', () => {
+        fetch(`${root}modify`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({id:document.getElementById("id").innerHTML,
+                title:document.getElementById("changetitle").value,
+                description:document.getElementById("changedescription").value,
+                author:document.getElementById("changeauthor").value})
+            })
+            .then(location.reload(true))
+    })
+</script>
+</body>
